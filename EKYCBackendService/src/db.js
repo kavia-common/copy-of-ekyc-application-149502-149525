@@ -19,14 +19,24 @@
  */
 const Database = require('better-sqlite3');
 const path = require('path');
+const fs = require('fs');
 
 const DB_PATH = process.env.SQLITE_PATH || path.join(__dirname, '..', 'data', 'app.sqlite');
 
-// Initialize DB
-const db = new Database(DB_PATH, { verbose: undefined });
+let db;
 
-// Ensure schema
-db.exec(`
+try {
+  // Ensure directory for DB exists to avoid ENOENT on creation
+  const dir = path.dirname(DB_PATH);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+
+  // Initialize DB
+  db = new Database(DB_PATH, { verbose: undefined });
+
+  // Ensure schema
+  db.exec(`
 PRAGMA foreign_keys = ON;
 PRAGMA journal_mode = WAL;
 PRAGMA synchronous = FULL;
@@ -107,7 +117,12 @@ CREATE TABLE IF NOT EXISTS signatures (
   linked_audit_id INTEGER,
   FOREIGN KEY (signer_user_id) REFERENCES users(id) ON DELETE CASCADE
 );
-
 `);
+  console.log(`[EKYCBackendService] SQLite initialized at ${DB_PATH}`);
+} catch (e) {
+  console.error('[EKYCBackendService] SQLite initialization failed:', e && e.message ? e.message : e);
+  // Rethrow to let the process crash early with clear message
+  throw e;
+}
 
 module.exports = db;

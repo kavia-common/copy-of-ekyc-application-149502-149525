@@ -61,7 +61,10 @@ paths:
           description: Unauthorized
     post:
       tags: [Bank]
-      summary: Create/Update bank details (requires e-sign placeholder)
+      summary: Create/Update bank details (requires e-sign binding)
+      description: |
+        Performs a critical update of bank details. Requires reasonForChange and e-sign binding.
+        If `critical` is true, the user must re-authenticate by confirming password.
       security:
         - bearerAuth: []
       requestBody:
@@ -70,12 +73,16 @@ paths:
           application/json:
             schema:
               type: object
+              required: [accountNumber, confirmAccountNumber, ifsc, fullNameForESign, agreeESign, reasonForChange]
               properties:
-                accountNumber: { type: string }
-                confirmAccountNumber: { type: string }
-                ifsc: { type: string, pattern: '^[A-Z]{4}0[0-9A-Z]{6}$' }
-                fullNameForESign: { type: string }
+                accountNumber: { type: string, minLength: 8, maxLength: 20 }
+                confirmAccountNumber: { type: string, minLength: 8, maxLength: 20 }
+                ifsc: { type: string, pattern: '^[A-Z]{4}0[A-Z0-9]{6}$' }
+                fullNameForESign: { type: string, minLength: 1 }
                 agreeESign: { type: boolean }
+                reasonForChange: { type: string, minLength: 1, maxLength: 250 }
+                critical: { type: boolean, description: 'If true, requires re-authentication' }
+                reauthPassword: { type: string, description: 'Password confirmation required when critical=true' }
       responses:
         '200':
           description: Saved
@@ -83,6 +90,8 @@ paths:
           description: Validation error
         '401':
           description: Unauthorized
+        '403':
+          description: Forbidden (missing permission)
 components:
   securitySchemes:
     bearerAuth:

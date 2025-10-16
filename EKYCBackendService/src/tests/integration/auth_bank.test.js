@@ -31,12 +31,13 @@ describe('Auth and Bank Integration', () => {
     token = res.body.token;
   });
 
-  test('save bank details requires auth and e-sign', async () => {
+  test('save bank details requires auth and e-sign and reason', async () => {
     let res = await request(app).post('/api/bank-details').send({
       accountNumber: '12345678', confirmAccountNumber: '12345678', ifsc: 'HDFC0ABC123'
     });
     expect(res.status).toBe(401);
 
+    // Missing reason
     res = await request(app)
       .post('/api/bank-details')
       .set('Authorization', `Bearer ${token}`)
@@ -47,12 +48,46 @@ describe('Auth and Bank Integration', () => {
         fullNameForESign: 'John Doe',
         agreeESign: true
       });
+    expect(res.status).toBe(400);
+
+    // With reason and critical requiring reauth (wrong password)
+    res = await request(app)
+      .post('/api/bank-details')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        accountNumber: '12345678',
+        confirmAccountNumber: '12345678',
+        ifsc: 'HDFC0ABC123',
+        fullNameForESign: 'John Doe',
+        agreeESign: true,
+        reasonForChange: 'Initial bank add',
+        critical: true,
+        reauthPassword: 'wrongpass'
+      });
+    expect(res.status).toBe(400);
+    expect(res.body.code).toBe('REAUTH_FAILED');
+
+    // Correct reauth
+    res = await request(app)
+      .post('/api/bank-details')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        accountNumber: '12345678',
+        confirmAccountNumber: '12345678',
+        ifsc: 'HDFC0ABC123',
+        fullNameForESign: 'John Doe',
+        agreeESign: true,
+        reasonForChange: 'Initial bank add',
+        critical: true,
+        reauthPassword: 'Aa1!aaaa'
+      });
     expect(res.status).toBe(200);
     expect(res.body.branch_info).toContain('Bank: HDFC');
+    expect(res.body.nonce).toBeTruthy();
   });
 
   test('audit entries created', () => {
-    const count = db.prepare('SELECT COUNT(*) as c FROM audit_trail').get().c;
+    const count = db.prepare('SELECT COUNT(*) as c FROM audit_log').get().c;
     expect(count).toBeGreaterThanOrEqual(3); // register, login, bank update
   });
 });

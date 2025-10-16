@@ -25,7 +25,15 @@
         "supertest": "^6.3.4"
     },
     "jest": {
-        "testEnvironment": "node"
+        "testEnvironment": "node",
+        "coverageThreshold": {
+          "global": {
+            "branches": 80,
+            "functions": 85,
+            "lines": 85,
+            "statements": 85
+          }
+        }
     },
     "nodemonConfig": {
         "watch": ["src"],

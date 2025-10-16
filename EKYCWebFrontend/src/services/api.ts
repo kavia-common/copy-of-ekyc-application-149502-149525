@@ -46,6 +46,9 @@ export function apiSaveBank(token: string, payload: {
   ifsc: string;
   fullNameForESign: string;
   agreeESign: boolean;
+  reasonForChange: string;
+  critical?: boolean;
+  reauthPassword?: string;
 }) {
   /** Save bank details with e-sign placeholder */
   return request('/api/bank-details', {

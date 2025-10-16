@@ -18,6 +18,10 @@ const mapMessage = (code) => {
     case 'IFSC_REQUIRED': return 'IFSC is required.';
     case 'IFSC_INVALID': return 'IFSC must match pattern: 4 letters + 0 + 6 alphanumeric.';
     case 'ESIGN_VALIDATION_FAILED': return 'Electronic signature confirmation is required.';
+    case 'REASON_REQUIRED': return 'Please provide a reason for this change.';
+    case 'REASON_TOO_LONG': return 'Reason for change must be under 250 characters.';
+    case 'REAUTH_FAILED': return 'Please confirm your password to authorize this critical change.';
+    case 'DB_ERROR': return 'A database error occurred. Please retry.';
     default: return 'An error occurred.';
   }
 };

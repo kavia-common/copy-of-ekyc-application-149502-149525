@@ -23,5 +23,16 @@ Traceability
 - REQ-VAL-001: pages/Register.tsx, pages/Login.tsx, components/Form/Input.tsx
 - REQ-BANK-001: pages/BankDetails.tsx, components/Form/IfscHelp.tsx
 
-Electronic Signature Placeholder
-- Name entry + consent checkbox required for critical bank updates; bound in backend using SHA-256 digest.
+Electronic Signature Binding
+- Name entry + consent checkbox required for bank updates; backend binds signature with nonce and digest to prevent replay.
+- reasonForChange is mandatory for bank updates; optional critical flag will prompt for password confirmation.
+
+Roles and Permissions
+- Roles: user, admin
+- Permission enforced on bank update: auth.self.update.bank
+
+Release Checklist
+- Validate OpenAPI reflects reasonForChange, critical, reauthPassword
+- Verify audit_log population (requestId, IP, userAgent, error fields)
+- Confirm signatures table nonce uniqueness
+- Ensure ≥85% test coverage across backend; UI tests updated for reason field

@@ -12,9 +12,11 @@ ALCOA+ Principles
 - Accurate: Server-side validation ensures input integrity.
 
 Audit Trail
-- Table: audit_trail(user_id, entity, action, before_state, after_state, reason, outcome, error, ip, created_at)
-- Middleware: src/middleware/audit.js wraps handlers via withAudit(entity, action).
-- For bank updates, e-sign placeholder binding stored as signature_digest, signed_at in bank_details.
+- Tables:
+  - audit_log (insert-only): request_id, user_id, unauth_actor, entity, entity_id, action, before_state, after_state, reason, outcome, error_code, error_message, stack, ip, user_agent, signature_id, created_at
+  - signatures: id, signer_user_id, nonce (UNIQUE), payload_digest, created_at, linked_audit_id
+- Middleware: src/middleware/audit.js wraps handlers via withAudit(entity, action) capturing requestId/IP/UserAgent and errors.
+- For bank updates, e-sign binding stored as signature_digest, signed_at in bank_details and signatures entry recorded.
 
 Access Controls
 - JWT Auth: src/middleware/auth.js

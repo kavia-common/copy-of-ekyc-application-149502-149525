@@ -14,6 +14,9 @@ export const BankDetails: React.FC<{ token: string }> = ({ token }) => {
   const [agree, setAgree] = useState(false);
   const [branchInfo, setBranchInfo] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
+  const [reason, setReason] = useState('');
+  const [critical, setCritical] = useState(false);
+  const [reauthPassword, setReauthPassword] = useState('');
 
   useEffect(() => {
     (async () => {
@@ -34,7 +37,12 @@ export const BankDetails: React.FC<{ token: string }> = ({ token }) => {
 
   const ifscValid = useMemo(() => IFSC_REGEX.test(ifsc), [ifsc]);
 
-  const canSubmit = useMemo(() => match && ifscValid && fullName.trim().length > 0 && agree, [match, ifscValid, fullName, agree]);
+  const canSubmit = useMemo(() => {
+    if (!match || !ifscValid || fullName.trim().length === 0 || !agree) return false;
+    if (reason.trim().length === 0 || reason.length > 250) return false;
+    if (critical && reauthPassword.length === 0) return false;
+    return true;
+  }, [match, ifscValid, fullName, agree, reason, critical, reauthPassword]);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +54,10 @@ export const BankDetails: React.FC<{ token: string }> = ({ token }) => {
         confirmAccountNumber,
         ifsc,
         fullNameForESign: fullName,
-        agreeESign: agree
+        agreeESign: agree,
+        reasonForChange: reason,
+        critical,
+        reauthPassword: critical ? reauthPassword : undefined
       });
       setBranchInfo(res.branch_info || null);
       setMsg('Bank details saved.');
@@ -75,6 +86,14 @@ export const BankDetails: React.FC<{ token: string }> = ({ token }) => {
       {branchInfo && <div role="status" style={{ marginTop: 8 }}>Branch: {branchInfo}</div>}
       <Input id="fullname" label="Type Full Name as Signature" value={fullName} onChange={setFullName} required
         helpText="Type your full name to acknowledge and sign this change." />
+      <Input id="reason" label="Reason for Change" value={reason} onChange={setReason} required
+        helpText="Provide a short reason (max 250 characters)." />
+      <div style={{ marginBottom: 12 }}>
+        <label><input type="checkbox" checked={critical} onChange={(e) => setCritical(e.target.checked)} /> Treat as critical change (requires password confirm)</label>
+      </div>
+      {critical && (
+        <Input id="reauth" type="password" label="Confirm Password" value={reauthPassword} onChange={setReauthPassword} required />
+      )}
       <div style={{ marginBottom: 12 }}>
         <label><input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} /> I agree and certify the above details are correct.</label>
       </div>

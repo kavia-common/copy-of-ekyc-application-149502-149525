@@ -12,7 +12,7 @@
 const EMAIL_MAX = 50;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MOBILE_REGEX = /^\d{10}$/;
-const IFSC_REGEX = /^[A-Z]{4}0[0-9A-Z]{6}$/;
+const IFSC_REGEX = /^[A-Z]{4}0[A-Z0-9]{6}$/;
 const PASSWORD_POLICY = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{8,}$/;
 const ACCT_ALLOWED = /^[0-9]{8,20}$/;
 

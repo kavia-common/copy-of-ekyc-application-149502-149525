@@ -1,0 +1,91 @@
+openapi: 3.0.3
+info:
+  title: EKYC Backend API
+  version: 1.0.0
+  description: API for Registration/Login validation and Bank details management with GxP audit and RBAC.
+servers:
+  - url: http://localhost:3000
+tags:
+  - name: Auth
+  - name: Bank
+paths:
+  /api/auth/register:
+    post:
+      tags: [Auth]
+      summary: Register user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string, maxLength: 50 }
+                mobile: { type: string, pattern: '^\d{10}$' }
+                password: { type: string, minLength: 8 }
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Validation error
+        '409':
+          description: Duplicate account
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      summary: Login via email or mobile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                identifier: { type: string, description: Email or mobile }
+                password: { type: string }
+      responses:
+        '200':
+          description: Token
+        '401':
+          description: Invalid credentials
+  /api/bank-details:
+    get:
+      tags: [Bank]
+      summary: Get bank details
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Bank details or null
+        '401':
+          description: Unauthorized
+    post:
+      tags: [Bank]
+      summary: Create/Update bank details (requires e-sign placeholder)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accountNumber: { type: string }
+                confirmAccountNumber: { type: string }
+                ifsc: { type: string, pattern: '^[A-Z]{4}0[0-9A-Z]{6}$' }
+                fullNameForESign: { type: string }
+                agreeESign: { type: boolean }
+      responses:
+        '200':
+          description: Saved
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

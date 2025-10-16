@@ -48,14 +48,14 @@ describe('Auth and Bank Integration', () => {
   });
 
   test('save bank details requires auth and e-sign and reason', async () => {
-    let res = await request(app).post('/api/bank-details').send({
+    let res = await request(app).put('/api/bank-details').send({
       accountNumber: '12345678', confirmAccountNumber: '12345678', ifsc: 'HDFC0ABC123'
     });
     expect(res.status).toBe(401);
 
     // Missing reason
     res = await request(app)
-      .post('/api/bank-details')
+      .put('/api/bank-details')
       .set('Authorization', `Bearer ${token}`)
       .send({
         accountNumber: '12345678',

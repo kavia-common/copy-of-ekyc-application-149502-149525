@@ -61,7 +61,7 @@ export function apiSaveBank(token: string, payload: {
 }) {
   /** Save bank details with e-sign placeholder — REQ-BANK-001, REQ-BANK-IFSC-001, REQ-ESIGN-001 */
   return request('/api/bank-details', {
-    method: 'POST',
+    method: 'PUT',
     headers: { Authorization: `Bearer ${token}` }, // TRACE: AC-API-01
     body: JSON.stringify(payload),
   });

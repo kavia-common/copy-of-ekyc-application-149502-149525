@@ -46,7 +46,7 @@ router.get('/bank-details',
 );
 
 /**
- * Endpoint: POST /api/bank-details
+ * Endpoint: PUT /api/bank-details
  * REQ IDs: REQ-BANK-001, REQ-BANK-IFSC-001, REQ-ESIGN-001, REQ-SEC-001, REQ-SEC-ACL-001
  * User Story: Update bank details with confirmation, IFSC validation, reason, e-sign, optional critical reauth
  * Acceptance Criteria:
@@ -62,7 +62,7 @@ router.get('/bank-details',
  * Validation Protocols: VP-BANK-001, VP-ESIGN-001, VP-SEC-001
  * Audit: action=UPDATE bank_details; captures before_state, after_state, reason, signature_id
  */
-router.post('/bank-details',
+router.put('/bank-details',
   authenticate, // TRACE: AC-06 — authenticated
   requireRole(['user', 'admin']), // TRACE: AC-06 — role
   requirePermission(PERMISSIONS.AUTH_SELF_UPDATE_BANK), // TRACE: AC-06 — permission

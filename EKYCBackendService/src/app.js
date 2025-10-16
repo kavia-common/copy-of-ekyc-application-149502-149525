@@ -80,9 +80,14 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(undefined, {
   swaggerUrl: '/openapi.json'
 }));
 
-// Mount API routes
+/**
+ * Mount API routes
+ * - Auth: /api/auth/*
+ * - Bank: /api/bank-details (GET, PUT)
+ */
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api', require('./routes/bank'));
+console.log('[EKYCBackendService] Routes mounted: /api/auth/*, /api/bank-details (GET, PUT)');
 
 // Unified error handling last
 app.use(errorHandler);

@@ -14,6 +14,10 @@ Key features
 - Electronic signature placeholder for bank details updates (signature_digest and signed_at)
 - OpenAPI spec at interfaces/openapi.yaml
 
+API summary
+- Auth: POST /api/auth/register, POST /api/auth/login
+- Bank: GET /api/bank-details, PUT /api/bank-details
+
 Run locally
 1) npm install
 2) npm run dev (or npm start)

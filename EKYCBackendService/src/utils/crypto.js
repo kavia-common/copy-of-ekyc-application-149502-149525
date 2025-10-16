@@ -1,4 +1,15 @@
 'use strict';
+/**
+ * REQUIREMENT TRACEABILITY - Module: utils/crypto.js
+ * Covered Requirements:
+ * - REQ-AUTH-001: Secure password handling and token creation
+ * - REQ-SEC-001: Security utilities supporting audit and auth flows
+ * Validation Protocol: VP-SEC-001
+ * GxP Impact: YES — ensures strong cryptographic controls for auth
+ * Risk Level: MEDIUM
+ * RELEASE GATE CHECKLIST:
+ * [x] PBKDF2 with salt   [x] Timing-safe compares   [x] JWT HS256 with exp
+ */
 const crypto = require('crypto');
 
 const ITERATIONS = 120000;
@@ -7,7 +18,7 @@ const DIGEST = 'sha512';
 
 // PUBLIC_INTERFACE
 function hashPassword(password) {
-  /** Hash a password using PBKDF2 with random salt; returns 'salt:hash' string */
+  /** Hash a password using PBKDF2 with random salt; returns 'salt:hash' string — REQ-AUTH-001 */
   const salt = crypto.randomBytes(16).toString('hex');
   const hash = crypto.pbkdf2Sync(password, salt, ITERATIONS, KEYLEN, DIGEST).toString('hex');
   return `${salt}:${hash}`;
@@ -15,7 +26,7 @@ function hashPassword(password) {
 
 // PUBLIC_INTERFACE
 function verifyPassword(password, stored) {
-  /** Verify password against stored 'salt:hash' string */
+  /** Verify password against stored 'salt:hash' string (timing-safe) — REQ-AUTH-001 */
   const [salt, hash] = String(stored).split(':');
   if (!salt || !hash) return false;
   const computed = crypto.pbkdf2Sync(password, salt, ITERATIONS, KEYLEN, DIGEST).toString('hex');
@@ -40,7 +51,7 @@ function signHS256(data, secret) {
 
 // PUBLIC_INTERFACE
 function createJWT(payload, secret, expiresInSeconds = 3600) {
-  /** Create a JWT HS256 signed token with expiration (exp) */
+  /** Create a JWT HS256 signed token with expiration (exp) — REQ-AUTH-001 */
   const header = { alg: 'HS256', typ: 'JWT' };
   const now = Math.floor(Date.now() / 1000);
   const body = { ...payload, iat: now, exp: now + expiresInSeconds };
@@ -53,7 +64,7 @@ function createJWT(payload, secret, expiresInSeconds = 3600) {
 
 // PUBLIC_INTERFACE
 function verifyJWT(token, secret) {
-  /** Verify HS256 JWT signature and expiration; returns payload or null */
+  /** Verify HS256 JWT signature and expiration; returns payload or null — REQ-AUTH-001 */
   try {
     const [h, p, s] = token.split('.');
     const expected = signHS256(`${h}.${p}`, secret);
@@ -69,7 +80,7 @@ function verifyJWT(token, secret) {
 
 // PUBLIC_INTERFACE
 function sha256Hex(input) {
-  /** Return hex SHA-256 digest */
+  /** Return hex SHA-256 digest — REQ-ESIGN-001 support */
   return crypto.createHash('sha256').update(input).digest('hex');
 }
 

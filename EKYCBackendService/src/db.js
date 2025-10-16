@@ -1,5 +1,18 @@
 'use strict';
 /**
+ * REQUIREMENT TRACEABILITY - Module: db.js
+ * Covered Requirements:
+ * - REQ-SEC-001: Audit Trail schema (audit_log)
+ * - REQ-ESIGN-001: signatures table with UNIQUE nonce
+ * - REQ-BANK-001/REQ-BANK-IFSC-001: bank_details constraints
+ * - REQ-VAL-001/REQ-AUTH-001: users constraints, registration_attempts tracking
+ * Validation Protocol: VP-SEC-001, VP-ESIGN-001, VP-BANK-001, VP-VAL-001
+ * GxP Impact: YES — schema enforces integrity for regulated data
+ * Risk Level: MEDIUM
+ * RELEASE GATE CHECKLIST:
+ * [x] FKs & constraints   [x] Indices   [x] WAL+synchronous=FULL for durability
+ */
+/**
  * SQLite database initialization using better-sqlite3 for synchronous, safe access.
  * Ensures schema for users, bank_details, audit_trail, registration_attempts exists.
  * Do not hardcode sensitive configuration; DB path is local file for this container only.

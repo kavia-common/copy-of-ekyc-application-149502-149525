@@ -28,4 +28,5 @@ Testing
 - Integration tests cover auth and bank endpoints; unit tests cover validation rules
 
 Compliance notes
-See src/README-GxP.md for ALCOA+, audit and traceability details.
+- See src/README-GxP.md for ALCOA+, audit, and traceability details.
+- See TRACEABILITY-MATRIX.md for Requirement → Implementation → Tests mapping.

@@ -1,3 +1,14 @@
+/**
+ * REQUIREMENT TRACEABILITY - Tests: Frontend register_bank.test.tsx
+ * REQ IDs:
+ * - REQ-VAL-001 (registration validations and guidance)
+ * - REQ-BANK-001 (double-entry match visual feedback)
+ * Acceptance Criteria validated by test names:
+ * - disables submit until valid -> AC-VAL-UI-Disable
+ * - shows green tick when account numbers match -> AC-BANK-UI-MatchIndicator
+ * GxP Impact: YES — automated verification of UI controls
+ * Risk Level: LOW
+ */
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Register } from '../pages/Register';

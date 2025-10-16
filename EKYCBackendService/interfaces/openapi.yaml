@@ -13,6 +13,11 @@ paths:
     post:
       tags: [Auth]
       summary: Register user
+      x-traceability:
+        requirements: ['REQ-VAL-001','REQ-AUTH-001','REQ-SEC-001']
+        stories:
+          - 'As a user, I want clear validation and guidance during registration.'
+        validation_protocols: ['VP-VAL-001','VP-SEC-001']
       requestBody:
         required: true
         content:
@@ -34,6 +39,11 @@ paths:
     post:
       tags: [Auth]
       summary: Login via email or mobile
+      x-traceability:
+        requirements: ['REQ-AUTH-001','REQ-VAL-001','REQ-SEC-001']
+        stories:
+          - 'As a registered user, I want to securely log in.'
+        validation_protocols: ['VP-VAL-001','VP-SEC-001']
       requestBody:
         required: true
         content:
@@ -52,6 +62,9 @@ paths:
     get:
       tags: [Bank]
       summary: Get bank details
+      x-traceability:
+        requirements: ['REQ-SEC-ACL-001','REQ-SEC-001']
+        validation_protocols: ['VP-SEC-001']
       security:
         - bearerAuth: []
       responses:
@@ -65,6 +78,11 @@ paths:
       description: |
         Performs a critical update of bank details. Requires reasonForChange and e-sign binding.
         If `critical` is true, the user must re-authenticate by confirming password.
+      x-traceability:
+        requirements: ['REQ-BANK-001','REQ-BANK-IFSC-001','REQ-ESIGN-001','REQ-SEC-001','REQ-SEC-ACL-001']
+        stories:
+          - 'As a user, I want to enter my bank account twice and validate IFSC; provide e-sign and reason.'
+        validation_protocols: ['VP-BANK-001','VP-ESIGN-001','VP-SEC-001']
       security:
         - bearerAuth: []
       requestBody:

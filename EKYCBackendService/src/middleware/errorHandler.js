@@ -1,4 +1,15 @@
 'use strict';
+/**
+ * REQUIREMENT TRACEABILITY - Module: middleware/errorHandler.js
+ * Covered Requirements:
+ * - REQ-VAL-001: Friendly validation messages and guidance
+ * - REQ-SEC-001: Consistent server responses for audit reliability
+ * Validation Protocol: VP-VAL-001, VP-SEC-001
+ * GxP Impact: YES — user guidance and consistent error semantics
+ * Risk Level: MEDIUM
+ * RELEASE GATE CHECKLIST:
+ * [x] Codes -> messages mapping   [x] Status codes standardized   [x] No sensitive info leakage
+ */
 
 const mapMessage = (code) => {
   switch (code) {
@@ -28,6 +39,18 @@ const mapMessage = (code) => {
 
 // PUBLIC_INTERFACE
 function errorHandler(err, req, res, next) {
+  /**
+   * Unified error translation to client-friendly messages.
+   * REQ IDs: REQ-VAL-001, REQ-SEC-001
+   * Acceptance Criteria:
+   * - AC-01: Validation errors -> 400
+   * - AC-02: Duplicate -> 409
+   * - AC-03: Auth failures -> 401
+   * - AC-04: Unknown -> 500, generic message (no leakage)
+   * GxP Impact: YES — consistent client guidance, audit-stable codes
+   * Risk Level: MEDIUM
+   * Validation Protocol: VP-VAL-001
+   */
   const code = err && err.code ? err.code : err && err.message && /^[A-Z_]+$/.test(err.message) ? err.message : 'INTERNAL_ERROR';
   const status = code === 'INVALID_CREDENTIALS' ? 401 :
     code === 'DUPLICATE_ACCOUNT' ? 409 :

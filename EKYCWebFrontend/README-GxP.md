@@ -20,8 +20,8 @@ Security & Privacy
 - JWT stored externally by hosting app; component exposes onLoggedIn callback.
 
 Traceability
-- REQ-VAL-001: pages/Register.tsx, pages/Login.tsx, components/Form/Input.tsx
-- REQ-BANK-001: pages/BankDetails.tsx, components/Form/IfscHelp.tsx
+- In-code: Module headers and function docblocks cite REQ IDs and AC; inline `TRACE:` comments mark AC enforcement.
+- Matrix: See TRACEABILITY-MATRIX.md for Requirement → Implementation → Tests mapping.
 
 Electronic Signature Binding
 - Name entry + consent checkbox required for bank updates; backend binds signature with nonce and digest to prevent replay.

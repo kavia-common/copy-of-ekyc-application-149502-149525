@@ -1,3 +1,19 @@
+/**
+ * REQUIREMENT TRACEABILITY - Tests: integration/auth_bank.test.js
+ * REQ IDs:
+ * - REQ-VAL-001 (registration/login validations, duplicate)
+ * - REQ-AUTH-001 (secure login)
+ * - REQ-BANK-001, REQ-BANK-IFSC-001 (bank validations)
+ * - REQ-ESIGN-001 (e-sign required)
+ * - REQ-SEC-001, REQ-SEC-ACL-001 (audit entries, auth/RBAC)
+ * Acceptance Criteria validated by test names:
+ * - register with validations and duplicate check -> AC-VAL-REG-01..04
+ * - login -> AC-AUTH-LOGIN-01..03
+ * - save bank details requires auth and e-sign and reason -> AC-BANK-SEC-01..05
+ * - audit entries created -> AC-AUDIT-01
+ * GxP Impact: YES — automated verification of critical controls
+ * Risk Level: MEDIUM
+ */
 'use strict';
 const request = require('supertest');
 const fs = require('fs');

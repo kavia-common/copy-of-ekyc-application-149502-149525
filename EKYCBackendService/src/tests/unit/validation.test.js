@@ -1,3 +1,15 @@
+/**
+ * REQUIREMENT TRACEABILITY - Tests: unit/validation.test.js
+ * REQ IDs: REQ-VAL-001, REQ-BANK-IFSC-001, REQ-BANK-001
+ * Acceptance Criteria validated by blocks:
+ * - email validation -> AC-VAL-EMAIL
+ * - mobile validation -> AC-VAL-MOBILE
+ * - password validation -> AC-VAL-PASSWORD
+ * - IFSC validation -> AC-BANK-IFSC
+ * - account validation -> AC-BANK-ACCT
+ * GxP Impact: YES — validates data integrity rules
+ * Risk Level: LOW
+ */
 'use strict';
 const v = require('../../services/validation');
 

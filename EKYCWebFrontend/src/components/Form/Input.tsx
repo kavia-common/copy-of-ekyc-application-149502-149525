@@ -1,3 +1,12 @@
+/**
+ * REQUIREMENT TRACEABILITY - Module: components/Form/Input.tsx
+ * REQ IDs: REQ-VAL-001 (clear validation messages, guidance), Usability/Accessibility
+ * Acceptance Criteria:
+ * - AC-01: Inputs show inline errors and help text
+ * - AC-02: A11y attributes set (aria-invalid, role="alert")
+ * GxP Impact: YES — improves data quality via user guidance
+ * Risk Level: LOW
+ */
 import React from 'react';
 import { ariaError } from '../../accessibility/aria-helpers';
 
@@ -23,12 +32,12 @@ export const Input: React.FC<{
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        {...ariaError(errId, hasError)}
+        {...ariaError(errId, hasError)} {/* TRACE: AC-02 */}
         aria-labelledby={helpText ? helpId : undefined}
         style={{ display: 'block', width: '100%', padding: '8px', borderColor: hasError ? '#c00' : '#ccc' }}
       />
       {helpText && <div id={helpId} style={{ fontSize: 12, color: '#555' }}>{helpText}</div>}
-      {hasError && <div id={errId} role="alert" style={{ color: '#c00', fontSize: 12 }}>{error}</div>}
+      {hasError && <div id={errId} role="alert" style={{ color: '#c00', fontSize: 12 }}>{error}</div>}{/* TRACE: AC-01/AC-02 */}
     </div>
   );
 };

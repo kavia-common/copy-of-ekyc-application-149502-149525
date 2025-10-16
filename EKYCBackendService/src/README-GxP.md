@@ -33,12 +33,7 @@ Electronic Signature Placeholder
 Error Handling
 - Unified handler: src/middleware/errorHandler.js returns consistent codes/messages.
 
-Traceability Matrix
-- REQ-VAL-001:
-  - Backend: routes/auth.js, services/auth.js, services/validation.js, middleware/errorHandler.js, db tables users, registration_attempts, audit_trail
-  - Frontend: client pages Register, Login, shared Input with help text
-  - Tests: unit/validation.test.js, integration/auth_bank.test.js (auth section)
-- REQ-BANK-001:
-  - Backend: routes/bank.js, services/bank.js, services/validation.js, utils/esign.js, audit middleware, bank_details table
-  - Frontend: BankDetails page, IfscHelp component, Input component
-  - Tests: integration/auth_bank.test.js (bank section)
+Traceability
+- In-code: Module-level REQUIREMENT TRACEABILITY headers and function docblocks citing REQ IDs, AC, GxP impact, risk, and protocol placeholders (VP-VAL-001/VP-BANK-001/VP-SEC-001/VP-ESIGN-001). Inline comments prefixed with `TRACE:` mark where AC are enforced.
+- Matrix: See TRACEABILITY-MATRIX.md for Requirement → Implementation → Tests mapping.
+

@@ -1,3 +1,16 @@
+/**
+ * REQUIREMENT TRACEABILITY - Module: Register.tsx
+ * REQ IDs: REQ-VAL-001, REQ-AUTH-001
+ * User Story: As a user, I want clear validation during registration and strong password creation.
+ * Acceptance Criteria:
+ * - AC-01: Email <=50 and valid format
+ * - AC-02: Mobile 10 digits
+ * - AC-03: Strong password policy and confirmation match
+ * GxP Impact: YES — front-end validation reduces invalid writes
+ * Risk Level: MEDIUM
+ * Validation Protocol: VP-VAL-001 (UI parity with backend)
+ * RELEASE GATE CHECKLIST: [x] Regex parity [x] Errors inline [x] Submit disabled until valid
+ */
 import React, { useMemo, useState } from 'react';
 import { Input } from '../components/Form/Input';
 import { apiRegister } from '../services/api';
@@ -20,17 +33,17 @@ export const Register: React.FC = () => {
   const isValid = useMemo(() => {
     const errs: Record<string, string | null> = {};
     if (!email) errs.email = 'Email is required.';
-    else if (email.length > EMAIL_MAX) errs.email = 'Email must be at most 50 characters.';
-    else if (!EMAIL_REGEX.test(email)) errs.email = 'Please enter a valid email address.';
+    else if (email.length > EMAIL_MAX) errs.email = 'Email must be at most 50 characters.'; // TRACE: AC-01
+    else if (!EMAIL_REGEX.test(email)) errs.email = 'Please enter a valid email address.'; // TRACE: AC-01
 
     if (!mobile) errs.mobile = 'Mobile number is required.';
-    else if (!MOBILE_REGEX.test(mobile)) errs.mobile = 'Mobile number must be exactly 10 digits.';
+    else if (!MOBILE_REGEX.test(mobile)) errs.mobile = 'Mobile number must be exactly 10 digits.'; // TRACE: AC-02
 
     if (!password) errs.password = 'Password is required.';
-    else if (!PASSWORD_POLICY.test(password)) errs.password = 'Password must be at least 8 characters with upper, lower, digit, and special.';
+    else if (!PASSWORD_POLICY.test(password)) errs.password = 'Password must be at least 8 characters with upper, lower, digit, and special.'; // TRACE: AC-03
 
     if (!rePw) errs.rePw = 'Please re-enter password.';
-    else if (password !== rePw) errs.rePw = 'Passwords do not match.';
+    else if (password !== rePw) errs.rePw = 'Passwords do not match.'; // TRACE: AC-03
 
     setErrors(errs);
     return Object.keys(errs).length === 0;

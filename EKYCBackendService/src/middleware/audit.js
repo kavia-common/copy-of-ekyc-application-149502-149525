@@ -1,4 +1,15 @@
 'use strict';
+/**
+ * REQUIREMENT TRACEABILITY - Module: middleware/audit.js
+ * Covered Requirements:
+ * - REQ-SEC-001: Audit Trail Implementation (ALCOA+)
+ * - REQ-ESIGN-001: Signature linkage captured via signature_id
+ * Validation Protocol: VP-SEC-001, VP-ESIGN-001
+ * GxP Impact: YES — attributable, contemporaneous, accurate records
+ * Risk Level: MEDIUM
+ * RELEASE GATE CHECKLIST:
+ * [x] Insert-only log   [x] Request/user/agent/IP captured   [x] Error details bounded   [x] Signature linkage
+ */
 const crypto = require('crypto');
 const db = require('../db');
 
@@ -13,7 +24,16 @@ function uuidv4() {
 
 // PUBLIC_INTERFACE
 function withAudit(entity, action) {
-  /** Wrap handler and record audit log with ALCOA+ and request metadata. Insert-only, durable. */
+  /**
+   * Wrap handler and record audit log with ALCOA+ and request metadata. Insert-only, durable.
+   * REQ IDs: REQ-SEC-001, REQ-ESIGN-001
+   * Acceptance Criteria:
+   * - AC-01: Capture request_id, user_id/unauth_actor, ip, user_agent
+   * - AC-02: Persist before_state and after_state where available
+   * - AC-03: Capture reasonForChange when present
+   * - AC-04: On success/failure, outcome and error fields recorded
+   * - AC-05: Link signature_id when provided
+   */
   return (handler) => {
     return async (req, res, next) => {
       const start = new Date().toISOString();
@@ -36,7 +56,7 @@ function withAudit(entity, action) {
 
       const insertAudit = (payload) => {
         // enforce durability
-        db.exec('PRAGMA synchronous = FULL;');
+        db.exec('PRAGMA synchronous = FULL;'); // TRACE: ensure durable write
         const stmt = db.prepare(`
           INSERT INTO audit_log
             (request_id, user_id, unauth_actor, entity, entity_id, action, before_state, after_state, reason, outcome, error_code, error_message, stack, ip, user_agent, signature_id, created_at)
@@ -50,15 +70,15 @@ function withAudit(entity, action) {
           payload.entity_id || null,
           action,
           before_state,
-          payload.after_state || null,
-          reason,
+          payload.after_state || null, // TRACE: AC-02
+          reason, // TRACE: AC-03
           payload.outcome,
-          payload.error_code || null,
+          payload.error_code || null, // TRACE: AC-04
           payload.error_message || null,
           payload.stack || null,
-          ip,
-          userAgent,
-          payload.signature_id || null,
+          ip, // TRACE: AC-01
+          userAgent, // TRACE: AC-01
+          payload.signature_id || null, // TRACE: AC-05
           start
         );
       };

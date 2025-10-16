@@ -1,3 +1,11 @@
+/**
+ * REQUIREMENT TRACEABILITY - Tests: unit/esign_rbac_audit.test.js
+ * REQ IDs: REQ-ESIGN-001 (nonce uniqueness, signature persistence)
+ * Acceptance Criteria validated:
+ * - creates unique nonce and signature rows -> AC-ESIGN-01
+ * GxP Impact: YES — verifies e-sign evidence creation
+ * Risk Level: LOW
+ */
 'use strict';
 const db = require('../../db');
 const { bindElectronicSignature } = require('../../utils/esign');

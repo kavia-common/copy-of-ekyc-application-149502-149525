@@ -1,3 +1,18 @@
+/**
+ * REQUIREMENT TRACEABILITY - Module: BankDetails.tsx
+ * REQ IDs: REQ-BANK-001, REQ-BANK-IFSC-001, REQ-ESIGN-001
+ * User Story: Enter account twice (show match), validate IFSC format, require e-sign and reason, optional critical reauth.
+ * Acceptance Criteria:
+ * - AC-01: Double-entry match shows green tick and prevents submit if mismatch
+ * - AC-02: IFSC must match regex and guides user
+ * - AC-03: reasonForChange required (<=250)
+ * - AC-04: If critical, prompt for password and block without it
+ * - AC-05: Require full name + consent for e-sign
+ * GxP Impact: YES — ensures UI parity with backend for regulated change
+ * Risk Level: MEDIUM
+ * Validation Protocols: VP-BANK-001, VP-ESIGN-001
+ * RELEASE GATE CHECKLIST: [x] Regex parity [x] Disabled submit until valid [x] Clear guidance and statuses
+ */
 import React, { useEffect, useMemo, useState } from 'react';
 import { Input } from '../components/Form/Input';
 import { IfscHelp } from '../components/Form/IfscHelp';
@@ -33,14 +48,14 @@ export const BankDetails: React.FC<{ token: string }> = ({ token }) => {
   }, [token]);
 
   const match = useMemo(() => accountNumber.replace(/\s+/g, '') !== '' &&
-    accountNumber.replace(/\s+/g, '') === confirmAccountNumber.replace(/\s+/g, ''), [accountNumber, confirmAccountNumber]);
+    accountNumber.replace(/\s+/g, '') === confirmAccountNumber.replace(/\s+/g, ''), [accountNumber, confirmAccountNumber]); // TRACE: AC-01
 
-  const ifscValid = useMemo(() => IFSC_REGEX.test(ifsc), [ifsc]);
+  const ifscValid = useMemo(() => IFSC_REGEX.test(ifsc), [ifsc]); // TRACE: AC-02
 
   const canSubmit = useMemo(() => {
-    if (!match || !ifscValid || fullName.trim().length === 0 || !agree) return false;
-    if (reason.trim().length === 0 || reason.length > 250) return false;
-    if (critical && reauthPassword.length === 0) return false;
+    if (!match || !ifscValid || fullName.trim().length === 0 || !agree) return false; // TRACE: AC-01/AC-02/AC-05
+    if (reason.trim().length === 0 || reason.length > 250) return false; // TRACE: AC-03
+    if (critical && reauthPassword.length === 0) return false; // TRACE: AC-04
     return true;
   }, [match, ifscValid, fullName, agree, reason, critical, reauthPassword]);
 

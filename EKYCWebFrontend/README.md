@@ -5,6 +5,8 @@ This frontend includes pages and components to support two stories:
 - Bank details double-entry + IFSC validation with e-sign placeholder fields
 
 Files
+- src/App.tsx (Router + navbar + links)
+- src/index.tsx (entrypoint)
 - src/pages/Register.tsx
 - src/pages/Login.tsx
 - src/pages/BankDetails.tsx
@@ -13,17 +15,19 @@ Files
 - src/services/api.ts (uses REACT_APP_API_BASE)
 - src/accessibility/aria-helpers.ts
 
-Usage
-- Import and render the pages in your app routing as needed.
-- Provide REACT_APP_API_BASE pointing to the backend (e.g., http://localhost:3000).
-
-Example
-// App integration example (pseudo)
-import { Register } from './pages/Register';
-import { Login } from './pages/Login';
-import { BankDetails } from './pages/BankDetails';
+Running locally
+1) Copy .env.example to .env and set REACT_APP_API_BASE to the backend base URL (e.g., http://localhost:3001).
+2) Install deps and start dev server with your React tooling (create-react-app/Vite/etc.). Ensure index.html has a <div id="root"></div>.
+3) Visit:
+   - /           Home with links
+   - /register   Register page
+   - /login      Login page
+   - /bank       Bank details (requires token from Login)
+   - /docs       Backend Swagger UI (proxied if same origin)
 
 Notes
 - Submit buttons are disabled until validations pass.
 - Input components are accessible (labels, aria-invalid, role alerts).
-- BankDetails requires a JWT token prop to call protected APIs.
+- BankDetails requires a JWT token; this app stores it in memory after login.
+- Ensure the backend runs and serves /health, /docs, and /openapi.json as documented.
+- For API base, set REACT_APP_API_BASE (see .env.example).

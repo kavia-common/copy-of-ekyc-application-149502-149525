@@ -66,11 +66,12 @@ function validateIFSC(ifsc) {
 function validateAccountNumber(acct, confirm) {
   /** Validate bank account number digits and matching confirm — REQ-BANK-001 */
   if (!acct || typeof acct !== 'string') return { ok: false, code: 'ACCOUNT_REQUIRED' };
-  // Normalize: trim and remove all internal spaces for both fields before validation/compare
-  const clean = String(acct).trim().replace(/\s+/g, '');
+  // Normalize: trim and remove all internal whitespace (Unicode-aware) for both fields before validation/compare
+  // This ensures that exotic whitespace (e.g., non-breaking spaces) doesn't trigger false mismatches.
+  const clean = String(acct).trim().replace(/\s+/gu, '');
   if (!ACCT_ALLOWED.test(clean)) return { ok: false, code: 'ACCOUNT_INVALID' }; // TRACE: length 8-20 digits
   if (confirm !== undefined) {
-    const clean2 = String(confirm).trim().replace(/\s+/g, '');
+    const clean2 = String(confirm).trim().replace(/\s+/gu, '');
     if (!ACCT_ALLOWED.test(clean2)) return { ok: false, code: 'ACCOUNT_INVALID' };
     if (clean !== clean2) return { ok: false, code: 'ACCOUNT_MISMATCH' }; // TRACE: double-entry match
   }

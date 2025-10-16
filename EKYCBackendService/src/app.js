@@ -9,12 +9,13 @@ const { errorHandler } = require('./middleware/errorHandler');
 // Initialize express app
 const app = express();
 
-// CORS
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+ // CORS (configurable via FRONTEND_ORIGIN; defaults to allow all for developer convenience)
+ const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || '*';
+ app.use(cors({
+   origin: FRONTEND_ORIGIN,
+   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+   allowedHeaders: ['Content-Type', 'Authorization']
+ }));
 app.set('trust proxy', true);
 
 // JSON parser early so body is available to auditing middleware too
@@ -75,10 +76,10 @@ app.get('/interfaces/openapi.yaml', (req, res) => {
   }
 });
 
-// Swagger UI using the parsed YAML via /openapi.json
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(undefined, {
-  swaggerUrl: '/openapi.json'
-}));
+ // Swagger UI using the parsed YAML via /openapi.json (ensures YAML single source of truth)
+ app.use('/docs', swaggerUi.serve, swaggerUi.setup(undefined, {
+   swaggerUrl: '/openapi.json'
+ }));
 
 /**
  * Mount API routes

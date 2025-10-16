@@ -100,9 +100,9 @@ export const BankDetails: React.FC<{ token: string }> = ({ token }) => {
       {ifscValid && <div role="status" style={{ fontSize: 12, color: 'green', marginTop: 4 }}>IFSC format valid.</div>}
       {branchInfo && <div role="status" style={{ marginTop: 8 }}>Branch: {branchInfo}</div>}
       <Input id="fullname" label="Type Full Name as Signature" value={fullName} onChange={setFullName} required
-        helpText="Type your full name to acknowledge and sign this change." />
+        helpText="Type your full name to acknowledge and sign this change (required for electronic signature binding)." />
       <Input id="reason" label="Reason for Change" value={reason} onChange={setReason} required
-        helpText="Provide a short reason (max 250 characters)." />
+        helpText="Provide a short reason (max 250 characters). This is required for compliance and audit." />
       <div style={{ marginBottom: 12 }}>
         <label><input type="checkbox" checked={critical} onChange={(e) => setCritical(e.target.checked)} /> Treat as critical change (requires password confirm)</label>
       </div>

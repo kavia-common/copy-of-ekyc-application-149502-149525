@@ -21,7 +21,7 @@ export const App: React.FC = () => {
         <Link to="/login" style={{ marginRight: 12 }}>Login</Link>
         <Link to="/bank">Bank Details</Link>
         <span style={{ float: 'right', fontSize: 12, color: '#555' }}>
-          {token ? 'Logged in' : 'Not logged in'} | Swagger: <a href="/docs" target="_blank" rel="noreferrer">/docs</a>
+          {token ? 'Logged in' : 'Not logged in'} | API Docs: <a href="/docs" target="_blank" rel="noreferrer">Swagger UI</a>
         </span>
       </nav>
       <Routes>

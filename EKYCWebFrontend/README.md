@@ -18,6 +18,7 @@ Files
 Running locally
 1) Copy .env.example to .env and set REACT_APP_API_BASE to the backend base URL (e.g., http://localhost:3001).
    - Ensure the backend is running and /openapi.json lists Auth and Bank endpoints.
+   - If frontend runs on a different origin (3000) and backend on 3001, CORS is already enabled. You may restrict backend CORS by setting FRONTEND_ORIGIN in backend .env.
 2) Install deps and start dev server with your React tooling (create-react-app/Vite/etc.). Ensure index.html has a <div id="root"></div>.
 3) Visit:
    - /           Home with links

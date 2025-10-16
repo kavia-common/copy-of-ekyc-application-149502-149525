@@ -31,4 +31,4 @@ Notes
 - Input components are accessible (labels, aria-invalid, role alerts).
 - BankDetails requires a JWT token; this app stores it in memory after login.
 - Ensure the backend runs and serves /health, /docs, and /openapi.json as documented.
-- For API base, set REACT_APP_API_BASE (see .env.example).
+- For API base, set REACT_APP_API_BASE (see .env.example). If you run frontend on a different origin (e.g., :3000) and backend on :3001, CORS is already enabled in the backend (src/app.js). Alternatively, you can serve both from the same origin using a dev proxy that maps /api and /docs to the backend, or set REACT_APP_API_BASE to http://localhost:3001 to avoid proxying.

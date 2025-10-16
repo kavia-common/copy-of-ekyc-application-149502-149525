@@ -2,87 +2,138 @@ openapi: 3.0.3
 info:
   title: EKYC Backend API
   version: 1.0.0
-  description: API for Registration/Login validation and Bank details management with GxP audit and RBAC.
+  description: >
+    EKYC API for registration/login validation and bank details management with ALCOA+ audit and RBAC.
+    This OpenAPI specification documents the currently implemented endpoints and their request/response models.
 servers:
-  - url: http://localhost:3000
+  - url: http://localhost:3001
+    description: Local development server
 tags:
+  - name: Health
+    description: Service monitoring endpoints
   - name: Auth
+    description: Registration and authentication
   - name: Bank
+    description: Bank details retrieval and update
 paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Health check
+      description: Returns current service health status including timestamp and environment.
+      operationId: getHealth
+      responses:
+        '200':
+          description: Current health status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+      x-traceability:
+        requirements: ['NONFUNC-AVAIL-001']
+        test_ids: ['IT-HEALTH-001']
   /api/auth/register:
     post:
       tags: [Auth]
       summary: Register user
-      x-traceability:
-        requirements: ['REQ-VAL-001','REQ-AUTH-001','REQ-SEC-001']
-        stories:
-          - 'As a user, I want clear validation and guidance during registration.'
-        validation_protocols: ['VP-VAL-001','VP-SEC-001']
+      description: Register a new user after validating email/mobile/password and duplicate check.
+      operationId: postAuthRegister
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                email: { type: string, maxLength: 50 }
-                mobile: { type: string, pattern: '^\d{10}$' }
-                password: { type: string, minLength: 8 }
+              $ref: '#/components/schemas/RegisterRequest'
       responses:
         '201':
-          description: Created
+          description: User registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
         '400':
           description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '409':
           description: Duplicate account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-traceability:
+        requirements: ['REQ-VAL-001','REQ-AUTH-001','REQ-SEC-001']
+        test_ids: ['IT-AUTH-REG-001']
   /api/auth/login:
     post:
       tags: [Auth]
       summary: Login via email or mobile
-      x-traceability:
-        requirements: ['REQ-AUTH-001','REQ-VAL-001','REQ-SEC-001']
-        stories:
-          - 'As a registered user, I want to securely log in.'
-        validation_protocols: ['VP-VAL-001','VP-SEC-001']
+      description: >
+        Authenticates using identifier (email/mobile) and password; returns JWT token and user info.
+      operationId: postAuthLogin
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                identifier: { type: string, description: Email or mobile }
-                password: { type: string }
+              $ref: '#/components/schemas/LoginRequest'
       responses:
         '200':
-          description: Token
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Missing credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-traceability:
+        requirements: ['REQ-AUTH-001','REQ-VAL-001','REQ-SEC-001']
+        test_ids: ['IT-AUTH-LOGIN-001']
   /api/bank-details:
     get:
       tags: [Bank]
       summary: Get bank details
-      x-traceability:
-        requirements: ['REQ-SEC-ACL-001','REQ-SEC-001']
-        validation_protocols: ['VP-SEC-001']
+      description: Returns the current user's bank details or null if not set.
+      operationId: getBankDetails
       security:
         - bearerAuth: []
       responses:
         '200':
           description: Bank details or null
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/BankDetails'
+                  - type: 'null'
         '401':
-          description: Unauthorized
-    post:
+          description: Unauthorized (missing/invalid token)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-traceability:
+        requirements: ['REQ-SEC-ACL-001','REQ-SEC-001']
+        test_ids: ['IT-BANK-GET-001']
+    put:
       tags: [Bank]
       summary: Create/Update bank details (requires e-sign binding)
       description: |
         Performs a critical update of bank details. Requires reasonForChange and e-sign binding.
         If `critical` is true, the user must re-authenticate by confirming password.
-      x-traceability:
-        requirements: ['REQ-BANK-001','REQ-BANK-IFSC-001','REQ-ESIGN-001','REQ-SEC-001','REQ-SEC-ACL-001']
-        stories:
-          - 'As a user, I want to enter my bank account twice and validate IFSC; provide e-sign and reason.'
-        validation_protocols: ['VP-BANK-001','VP-ESIGN-001','VP-SEC-001']
+      operationId: putBankDetails
       security:
         - bearerAuth: []
       requestBody:
@@ -90,29 +141,209 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required: [accountNumber, confirmAccountNumber, ifsc, fullNameForESign, agreeESign, reasonForChange]
-              properties:
-                accountNumber: { type: string, minLength: 8, maxLength: 20 }
-                confirmAccountNumber: { type: string, minLength: 8, maxLength: 20 }
-                ifsc: { type: string, pattern: '^[A-Z]{4}0[A-Z0-9]{6}$' }
-                fullNameForESign: { type: string, minLength: 1 }
-                agreeESign: { type: boolean }
-                reasonForChange: { type: string, minLength: 1, maxLength: 250 }
-                critical: { type: boolean, description: 'If true, requires re-authentication' }
-                reauthPassword: { type: string, description: 'Password confirmation required when critical=true' }
+              $ref: '#/components/schemas/BankUpdateRequest'
       responses:
         '200':
-          description: Saved
+          description: Saved bank details metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankUpdateResponse'
         '400':
-          description: Validation error
+          description: Validation or re-authentication error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized
+          description: Unauthorized (missing/invalid token)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '403':
           description: Forbidden (missing permission)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-traceability:
+        requirements: ['REQ-BANK-001','REQ-BANK-IFSC-001','REQ-ESIGN-001','REQ-SEC-001','REQ-SEC-ACL-001']
+        test_ids: ['IT-BANK-PUT-001','UT-BANK-VAL-001']
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+          description: Service status indicator
+        message:
+          type: string
+          example: Service is healthy
+        timestamp:
+          type: string
+          format: date-time
+        environment:
+          type: string
+          example: development
+      required: [status, message, timestamp, environment]
+    RegisterRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          maxLength: 50
+          description: Email address
+        mobile:
+          type: string
+          pattern: '^\d{10}$'
+          description: 10-digit mobile number
+        password:
+          type: string
+          minLength: 8
+          description: Strong password as per policy
+      required: [email, mobile, password]
+    RegisterResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+        mobile:
+          type: string
+      required: [id, email, mobile]
+    LoginRequest:
+      type: object
+      properties:
+        identifier:
+          type: string
+          description: Email or mobile number
+        password:
+          type: string
+          description: User password
+      required: [identifier, password]
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Bearer JWT token
+        user:
+          type: object
+          properties:
+            id:
+              type: integer
+            email:
+              type: string
+              nullable: true
+            mobile:
+              type: string
+              nullable: true
+            role:
+              type: string
+          required: [id, role]
+      required: [token, user]
+    BankDetails:
+      type: object
+      nullable: false
+      properties:
+        id:
+          type: integer
+        account_number:
+          type: string
+          description: Masking not applied here; returned as stored
+        ifsc:
+          type: string
+          pattern: '^[A-Z]{4}0[A-Z0-9]{6}$'
+        branch_info:
+          type: string
+        signed_at:
+          type: string
+          format: date-time
+      required: [id, account_number, ifsc]
+    BankUpdateRequest:
+      type: object
+      required:
+        - accountNumber
+        - confirmAccountNumber
+        - ifsc
+        - fullNameForESign
+        - agreeESign
+        - reasonForChange
+      properties:
+        accountNumber:
+          type: string
+          minLength: 8
+          maxLength: 20
+          description: Bank account number
+        confirmAccountNumber:
+          type: string
+          minLength: 8
+          maxLength: 20
+          description: Must match accountNumber
+        ifsc:
+          type: string
+          pattern: '^[A-Z]{4}0[A-Z0-9]{6}$'
+          description: IFSC code
+        fullNameForESign:
+          type: string
+          minLength: 1
+          description: Full name to bind e-signature
+        agreeESign:
+          type: boolean
+          description: Consent flag for e-signature
+        reasonForChange:
+          type: string
+          minLength: 1
+          maxLength: 250
+          description: Reason for change (required)
+        critical:
+          type: boolean
+          description: If true, requires re-authentication
+        reauthPassword:
+          type: string
+          description: Password confirmation required when critical = true
+    BankUpdateResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Bank details record id
+        ifsc:
+          type: string
+        branch_info:
+          type: string
+        signed_at:
+          type: string
+          format: date-time
+        nonce:
+          type: string
+          description: E-sign nonce associated with this change
+      required: [id, ifsc, branch_info, signed_at, nonce]
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+          example: INVALID_CREDENTIALS
+        message:
+          type: string
+          description: Human readable message
+      required: [code, message]
+security:
+  - bearerAuth: []
+x-traceability:
+  project: EKYC Suite
+  owner: EKYCBackendService
+  notes: >
+    Endpoints annotated with requirement IDs and test references to maintain ALCOA+ traceability.

@@ -44,7 +44,10 @@ function saveBankDetails({ userId, accountNumber, confirmAccountNumber, ifsc, fu
    * Validation Protocols: VP-BANK-001, VP-ESIGN-001
    * Audit: Route wrapper captures before/after, reason, signatureId
    */
-  const vAcct = validateAccountNumber(accountNumber, confirmAccountNumber); // TRACE: AC-01
+  // Normalize payload defensively before validation
+  const normAccountNumber = typeof accountNumber === 'string' ? accountNumber.trim() : accountNumber;
+  const normConfirmAccountNumber = typeof confirmAccountNumber === 'string' ? confirmAccountNumber.trim() : confirmAccountNumber;
+  const vAcct = validateAccountNumber(normAccountNumber, normConfirmAccountNumber); // TRACE: AC-01
   if (!vAcct.ok) return { ok: false, code: vAcct.code };
   const vIfsc = validateIFSC(ifsc); // TRACE: AC-02
   if (!vIfsc.ok) return { ok: false, code: vIfsc.code };

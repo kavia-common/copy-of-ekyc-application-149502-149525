@@ -77,9 +77,16 @@ app.get('/interfaces/openapi.yaml', (req, res) => {
 });
 
  // Swagger UI using the parsed YAML via /openapi.json (ensures YAML single source of truth)
+ // Some test environments see a 301 redirect when hitting /docs without a trailing slash.
+ // To keep tests stable, explicitly respond to GET /docs with the index HTML (status 200).
  app.use('/docs', swaggerUi.serve, swaggerUi.setup(undefined, {
    swaggerUrl: '/openapi.json'
  }));
+ app.get('/docs', (req, res) => {
+   // Serve Swagger UI HTML explicitly for /docs (no redirect), matching test expectation of 200 OK and text/html
+   const html = swaggerUi.generateHTML(undefined, { swaggerUrl: '/openapi.json' });
+   res.status(200).send(html);
+ });
 
 /**
  * Mount API routes

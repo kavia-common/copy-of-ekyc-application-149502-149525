@@ -67,9 +67,16 @@ function saveBankDetails({ userId, accountNumber, confirmAccountNumber, ifsc, fu
 
   // Build canonical payload for digest
   const payload = { userId, accountNumber: vAcct.clean, ifsc, reason };
-  const { signature_digest, signed_at, nonce, signature_id } = bindElectronicSignature({
-    userId, fullName: fullNameForESign, agree: !!agreeESign, entity: 'bank_details', payload
-  }); // TRACE: AC-05 — e-sign binding
+  let signature_digest, signed_at, nonce, signature_id;
+  try {
+    ({ signature_digest, signed_at, nonce, signature_id } = bindElectronicSignature({
+      userId, fullName: fullNameForESign, agree: !!agreeESign, entity: 'bank_details', payload
+    }));
+  } catch (e) {
+    // Normalize e-sign validation failure to standard code pathway
+    const code = e && e.code ? e.code : 'ESIGN_VALIDATION_FAILED';
+    return { ok: false, code };
+  } // TRACE: AC-05 — e-sign binding
 
   const now = new Date().toISOString();
 
